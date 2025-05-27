@@ -1,6 +1,37 @@
 {
   "login": {
     "title": "Bienvenido a Housy",
-    "description": "Bienvenido a Housy y comienza a gestionar el estado de tu condominio"
+    "description": "Bienvenido a Housy y comienza a gestionar el estado de tu condominio",
+    "buttons": {
+      "google": "Ingresa con Google"
+    },
+    "or": "O ingresa con",
+    "forgotPassword": "Olvidaste la contraseña ?",
+    "register": {
+      "question": "No tienes una cuenta ?",
+      "link": "Registrate"
+    },
+    "form": {
+      "email": {
+        "name": "email",
+        "placeholder": "correo@ejemplo.com",
+        "label": "Correo",
+        "errors": {
+          "required": "Ingresa tu correo",
+          "invalid": "Correo Invalido"
+        }
+      },
+      "password": {
+        "name": "password",
+        "placeholder": "Ingresa tu contraseña aqui",
+        "label": "Contraseña",
+        "errors": {
+          "required": "Ingresa una contraseña"
+        }
+      },
+      "button": {
+        "text": "Ingresa"
+      }
+    }
   }
 }

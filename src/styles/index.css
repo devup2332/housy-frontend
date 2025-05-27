@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "housy-lib/dist/index.css";
 
 /* Theme Colors*/
 @import "./theme.css";
