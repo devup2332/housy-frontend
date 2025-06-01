@@ -4,7 +4,7 @@ import type { ComponentProps, JSX } from "react";
 import type { UseFormRegister } from "react-hook-form";
 
 interface Props extends ComponentProps<"input"> {
-  Icon: JSX.Element;
+  Icon?: JSX.Element;
   label?: string;
   register: UseFormRegister<any>;
   error?: string;

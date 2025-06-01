@@ -1,15 +1,16 @@
 import GoogleIcon from "@/components/Icons/GoogleIcon";
 import Or from "@/components/UI/Or";
 import { useTranslation } from "react-i18next";
-import { Button } from "housy-lib";
+import { Button, Toast } from "housy-lib";
 import { useForm } from "react-hook-form";
 import FormControl from "@/components/UI/FormControl";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import EmailIcon from "@/components/Icons/EmailIcon";
 import OpenEyeIcon from "@/components/Icons/OpenEyeIcon";
-import { useState, type ComponentProps } from "react";
+import { useState } from "react";
 import CloseEyeIcon from "@/components/Icons/CloseEyeIcon";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   loginSchema,
   type LoginSchemaFields,
@@ -17,23 +18,23 @@ import {
 } from "@/schemas/loginSchema";
 import { cn } from "@/utils/cn";
 import LoaderIcon from "@/components/Icons/LoaderIcon";
-import { sleep } from "@/utils/sleep";
 import WorldIcon from "@/components/Icons/WorldIcon";
 import SunIcon from "@/components/Icons/SunIcon";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setTheme } from "@/store/reducers/ThemeReducer";
 import MoonIcon from "@/components/Icons/MoonIcon";
 import { LANGUAGE_KEY } from "@/providers/TranslationProvider";
+import type { FieldControl } from "@/types/controls";
+import { setTheme } from "@/store/slices/ThemeSlice";
+import { useClerk, useSignIn } from "@clerk/clerk-react";
+import { toast } from "sonner";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/clerk-react";
 
-type Field = {
-  name: LoginSchemaFields;
-  label: string;
-  type: ComponentProps<"input">["type"];
-  placeholder: string;
-  icon?: React.FC;
-};
-
-const fields: Field[] = [
+const fields: FieldControl<LoginSchemaFields>[] = [
   {
     name: "email",
     label: "login.form.email.label",
@@ -52,6 +53,9 @@ const fields: Field[] = [
 const Login = () => {
   const { t, i18n } = useTranslation();
   const dispath = useAppDispatch();
+  const { signIn } = useSignIn();
+  const { setActive, handleRedirectCallback } = useClerk();
+  const navigate = useNavigate();
   const theme = useAppSelector((state) => state.theme.currentTheme);
   const {
     register,
@@ -61,28 +65,64 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
   });
   const [loading, setLoading] = useState(false);
-  const handleLogin = async (data: LoginSchemaType) => {
-    setLoading(true);
-    await sleep(2000);
-    console.log({ data });
-    Object.entries(data).forEach(([, value]) => {
-      value.trim();
-    });
-    setLoading(false);
-  };
   const [showPassword, setShowPassword] = useState(false);
+  const handleLogin = async (data: LoginSchemaType) => {
+    try {
+      setLoading(true);
+      const response = await signIn?.create({
+        identifier: data.email,
+        password: data.password,
+      });
+      if (response && response?.status === "complete" && setActive) {
+        await setActive({
+          session: response.createdSessionId,
+        });
+
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      toast.custom(
+        () => {
+          return (
+            <Toast
+              text={t(`login.form.errors.${err.errors[0].code}`)}
+              type="error"
+              className="bg-bg-1 text-text-1 border-border-2 max-w-[350px]"
+            />
+          );
+        },
+        {
+          position: "bottom-center",
+        },
+      );
+      console.log({ err });
+    } finally {
+      setLoading(false);
+    }
+  };
+  const googleLogin = async () => {
+    console.log("Here");
+    await signIn?.authenticateWithRedirect({
+      strategy: "oauth_google",
+      redirectUrl: "/sso-callback",
+      redirectUrlComplete: "/",
+    });
+  };
   return (
     <div className="h-screen bg-bg-1 lg:bg-bg-2 grid place-items-center">
-      <div className="w-10/12 grid gap-6 max-w-sm lg:bg-bg-1 p-4 lg:max-w-[480px] lg:px-14 lg:rounded-xl lg:py-14">
-        <h1 className="text-center text-text-1 text-2xl font-bold">
-          {t("login.title")}
-        </h1>
-        <p className="text-center text-sm text-text-2">
-          {t("login.description")}
-        </p>
+      <div className="w-10/12 grid gap-6 max-w-sm lg:bg-bg-1 p-4 lg:max-w-[480px] lg:px-14 lg:rounded-xl lg:py-14 lg:shadow-lg lg:shadow-shadow-1 2xl:py-20">
+        <div className="grid gap-3">
+          <h1 className="text-center text-text-1 text-2xl font-bold">
+            {t("login.title")}
+          </h1>
+          <p className="text-center text-sm text-text-2">
+            {t("login.description")}
+          </p>
+        </div>
         <Button
           className="font-semibold w-full border-border-1 text-text-1 hover:bg-bg-2/30"
           variant="outlined"
+          onClick={googleLogin}
         >
           <GoogleIcon className="w-6 h-6 mr-2" />
           {t("login.buttons.google")}
@@ -138,6 +178,7 @@ const Login = () => {
             variant="filled"
             className="bg-primary font-semibold hover:bg-primary/90"
             type="submit"
+            disabled={loading}
           >
             {loading && <LoaderIcon className="animate-spin" />}
             {t("login.form.button.text")}
@@ -151,7 +192,7 @@ const Login = () => {
         </form>
       </div>
 
-      <div className="flex gap-4 items-center absolute bottom-4 left-1/2 -translate-x-1/2">
+      <div className="flex gap-4 items-center absolute bottom-4 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-auto lg:right-6 lg:bottom-6">
         <Button
           onClick={() => {
             const l = i18n.language === "es" ? "en" : "es";
