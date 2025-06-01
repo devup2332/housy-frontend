@@ -12,50 +12,55 @@ import PrivateRoute from "./guards/privateRoutes";
 import PublicRoute from "./guards/publicRoute";
 import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 
-export const router = createBrowserRouter([
-  {
-    path: "/login",
-    element: <PublicRoute Component={Login} />,
-  },
-  {
-    path: "/sso-callback",
-    element: (
-      <AuthenticateWithRedirectCallback signInFallbackRedirectUrl="/dashboard" />
-    ),
-  },
-  {
-    path: "/register",
-    element: <PublicRoute Component={Register} />,
-    children: [
-      {
-        index: true,
-        Component: Step1,
-      },
-      {
-        path: "step2",
-        Component: Step2,
-      },
-      {
-        path: "step3",
-        Component: Step3,
-      },
-    ],
-  },
-  {
-    path: "/forgotPassword",
-    Component: ForgotPassword,
-  },
-  {
-    path: "/",
-    Component: App,
-  },
-  {
-    path: "/dashboard",
-    element: <PrivateRoute Component={Dashboard} />,
-  },
+export const router = createBrowserRouter(
+  [
+    {
+      path: "/login",
+      element: <PublicRoute Component={Login} />,
+    },
+    {
+      path: "/sso-callback",
+      element: (
+        <AuthenticateWithRedirectCallback signInFallbackRedirectUrl="/dashboard" />
+      ),
+    },
+    {
+      path: "/register",
+      element: <PublicRoute Component={Register} />,
+      children: [
+        {
+          index: true,
+          Component: Step1,
+        },
+        {
+          path: "step2",
+          Component: Step2,
+        },
+        {
+          path: "step3",
+          Component: Step3,
+        },
+      ],
+    },
+    {
+      path: "/forgotPassword",
+      Component: ForgotPassword,
+    },
+    {
+      path: "/",
+      Component: App,
+    },
+    {
+      path: "/dashboard",
+      element: <PrivateRoute Component={Dashboard} />,
+    },
 
+    {
+      path: "/properties",
+      Component: Properties,
+    },
+  ],
   {
-    path: "/properties",
-    Component: Properties,
+    basename: "/",
   },
-]);
+);
