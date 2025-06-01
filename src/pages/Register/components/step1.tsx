@@ -12,7 +12,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { setRegisterData } from "@/store/slices/RegisterSlice";
 import type { FieldControl } from "@/types/controls";
 import { cn } from "@/utils/cn";
-import { useSignIn, useSignUp } from "@clerk/clerk-react";
+import { useSignUp } from "@clerk/clerk-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "housy-lib";
 import { useState } from "react";

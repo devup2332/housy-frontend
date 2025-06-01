@@ -27,12 +27,6 @@ import type { FieldControl } from "@/types/controls";
 import { setTheme } from "@/store/slices/ThemeSlice";
 import { useClerk, useSignIn } from "@clerk/clerk-react";
 import { toast } from "sonner";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/clerk-react";
 
 const fields: FieldControl<LoginSchemaFields>[] = [
   {
@@ -54,7 +48,7 @@ const Login = () => {
   const { t, i18n } = useTranslation();
   const dispath = useAppDispatch();
   const { signIn } = useSignIn();
-  const { setActive, handleRedirectCallback } = useClerk();
+  const { setActive } = useClerk();
   const navigate = useNavigate();
   const theme = useAppSelector((state) => state.theme.currentTheme);
   const {
