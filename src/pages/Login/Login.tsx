@@ -25,8 +25,8 @@ import MoonIcon from "@/components/Icons/MoonIcon";
 import { LANGUAGE_KEY } from "@/providers/TranslationProvider";
 import type { FieldControl } from "@/types/controls";
 import { setTheme } from "@/store/slices/ThemeSlice";
-import { useClerk, useSignIn } from "@clerk/clerk-react";
 import { toast } from "sonner";
+import { loginWithGoogle } from "@/utils/supabase";
 
 const fields: FieldControl<LoginSchemaFields>[] = [
   {
@@ -47,8 +47,6 @@ const fields: FieldControl<LoginSchemaFields>[] = [
 const Login = () => {
   const { t, i18n } = useTranslation();
   const dispath = useAppDispatch();
-  const { signIn } = useSignIn();
-  const { setActive } = useClerk();
   const navigate = useNavigate();
   const theme = useAppSelector((state) => state.theme.currentTheme);
   const {
@@ -63,17 +61,9 @@ const Login = () => {
   const handleLogin = async (data: LoginSchemaType) => {
     try {
       setLoading(true);
-      const response = await signIn?.create({
-        identifier: data.email,
-        password: data.password,
-      });
-      if (response && response?.status === "complete" && setActive) {
-        await setActive({
-          session: response.createdSessionId,
-        });
+      console.log({ data });
 
-        navigate("/dashboard");
-      }
+      navigate("/dashboard");
     } catch (err: any) {
       toast.custom(
         () => {
@@ -94,14 +84,7 @@ const Login = () => {
       setLoading(false);
     }
   };
-  const googleLogin = async () => {
-    console.log("Here");
-    await signIn?.authenticateWithRedirect({
-      strategy: "oauth_google",
-      redirectUrl: "/sso-callback",
-      redirectUrlComplete: "/",
-    });
-  };
+  const googleLogin = () => loginWithGoogle();
   return (
     <div className="h-screen bg-bg-1 lg:bg-bg-2 grid place-items-center">
       <div className="w-10/12 grid gap-6 max-w-sm lg:bg-bg-1 p-4 lg:max-w-[480px] lg:px-14 lg:rounded-xl lg:py-14 lg:shadow-lg lg:shadow-shadow-1 2xl:py-20">

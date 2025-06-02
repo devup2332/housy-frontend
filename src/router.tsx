@@ -6,11 +6,10 @@ import Dashboard from "./pages/App/Dashboard/Dashboard";
 import Properties from "./pages/App/Properties/Properties";
 import Step1 from "./pages/Register/components/step1";
 import Step2 from "./pages/Register/components/step2";
-import Step3 from "./pages/Register/components/step3";
 import Register from "./pages/Register/components/Register";
 import PrivateRoute from "./guards/privateRoutes";
 import PublicRoute from "./guards/publicRoute";
-import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
+import Callback from "./pages/Callback/Callback";
 
 export const router = createBrowserRouter(
   [
@@ -20,25 +19,19 @@ export const router = createBrowserRouter(
     },
     {
       path: "/sso-callback",
-      element: (
-        <AuthenticateWithRedirectCallback signInFallbackRedirectUrl="/dashboard" />
-      ),
+      element: <Callback />,
     },
     {
       path: "/register",
-      element: <PublicRoute Component={Register} />,
+      element: <Register />,
       children: [
         {
           index: true,
-          Component: Step1,
+          element: <PublicRoute Component={Step1} />,
         },
         {
-          path: "step2",
-          Component: Step2,
-        },
-        {
-          path: "step3",
-          Component: Step3,
+          path: "fullName",
+          element: <PrivateRoute Component={Step2} />,
         },
       ],
     },

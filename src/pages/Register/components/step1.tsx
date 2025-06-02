@@ -1,6 +1,8 @@
+import CloseEyeIcon from "@/components/Icons/CloseEyeIcon";
 import EmailIcon from "@/components/Icons/EmailIcon";
 import GoogleIcon from "@/components/Icons/GoogleIcon";
 import LoaderIcon from "@/components/Icons/LoaderIcon";
+import OpenEyeIcon from "@/components/Icons/OpenEyeIcon";
 import FormControl from "@/components/UI/FormControl";
 import Or from "@/components/UI/Or";
 import {
@@ -12,7 +14,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { setRegisterData } from "@/store/slices/RegisterSlice";
 import type { FieldControl } from "@/types/controls";
 import { cn } from "@/utils/cn";
-import { useSignUp } from "@clerk/clerk-react";
+import { loginWithGoogle, supabase } from "@/utils/supabase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "housy-lib";
 import { useState } from "react";
@@ -28,12 +30,24 @@ const controls: FieldControl<RegisterSchemaFieldsStepOne>[] = [
     placeholder: "register.step1.form.email.placeholder",
     icon: EmailIcon,
   },
+  {
+    name: "password",
+    type: "password",
+    label: "register.step1.form.password.label",
+    placeholder: "register.step1.form.password.placeholder",
+  },
+  {
+    name: "confirmPassword",
+    type: "password",
+    label: "register.step1.form.confirmPassword.label",
+    placeholder: "register.step1.form.confirmPassword.placeholder",
+  },
 ];
 const Step1 = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
-  const { signUp } = useSignUp();
   const navigate = useNavigate();
   const {
     register,
@@ -42,19 +56,18 @@ const Step1 = () => {
   } = useForm({
     resolver: zodResolver(registerStepOneSchema),
   });
-  const registerGoogle = async () => {
-    signUp?.authenticateWithRedirect({
-      strategy: "oauth_google",
-      redirectUrl: "/sso-callback",
-      redirectUrlComplete: "/",
-      continueSignUp: true,
-    });
-  };
+  const registerGoogle = () => loginWithGoogle("/register/step1");
   const continueForm = async (data: RegisterSchemaStepOneType) => {
     try {
+      const { email, password } = data;
       setLoading(true);
       dispatch(setRegisterData({ email: data.email }));
-      navigate("/register/step2");
+      await supabase.auth.signUp({
+        password,
+        email,
+      });
+
+      navigate("/register/fullName");
     } catch (err) {
       console.log({ err });
     } finally {
@@ -84,24 +97,39 @@ const Step1 = () => {
         {controls.map((control) => {
           const { placeholder, name, label, type } = control;
           const error = errors[name] ? t(errors[name].message!) : "";
-          const Icon = control.icon!;
+          const isPasswordControl =
+            name === "password" || name === "confirmPassword";
+          const Icon =
+            name === "password"
+              ? showPassword
+                ? OpenEyeIcon
+                : CloseEyeIcon
+              : control.icon;
           return (
             <FormControl
               key={name}
               Icon={
-                <Icon
-                  className={cn(
-                    "w-6 h-6 text-text-2 stroke-current",
-                    error && "text-red-500",
-                  )}
-                />
+                Icon && (
+                  <Icon
+                    className={cn(
+                      "w-6 h-6 text-text-2 stroke-current ",
+                      isPasswordControl && "cursor-pointer",
+                      error && "text-red-500",
+                    )}
+                    onClick={() =>
+                      name === "password" && setShowPassword(!showPassword)
+                    }
+                  />
+                )
               }
               placeholder={t(placeholder)}
               name={name}
               register={register}
               error={error}
               label={t(label)}
-              type={type}
+              type={
+                isPasswordControl ? (showPassword ? "text" : "password") : type
+              }
             />
           );
         })}

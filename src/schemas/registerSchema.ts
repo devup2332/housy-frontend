@@ -1,26 +1,37 @@
 import { z } from "zod";
 
-export const registerStepOneSchema = z.object({
-  email: z
-    .string()
-    .min(1, {
-      message: "register.step1.form.email.errors.required",
-    })
-    .email({
-      message: "register.step1.form.email.errors.invalid",
-    })
-    .transform((val, ctx) => {
-      //set logic to validate email
-      console.log({ ctx });
-      // return ctx.addIssue({
-      //   code: "custom",
-      //   fatal: true,
-      //   message: "register.step1.form.email.errors.inUse",
-      // });
+export const registerStepOneSchema = z
+  .object({
+    email: z
+      .string()
+      .min(1, {
+        message: "register.step1.form.email.errors.required",
+      })
+      .email({
+        message: "register.step1.form.email.errors.invalid",
+      })
+      .transform((val, ctx) => {
+        //set logic to validate email
+        console.log({ ctx });
+        // return ctx.addIssue({
+        //   code: "custom",
+        //   fatal: true,
+        //   message: "register.step1.form.email.errors.inUse",
+        // });
 
-      return val;
+        return val;
+      }),
+    password: z.string().min(1, {
+      message: "register.step3.form.password.errors.required",
     }),
-});
+    confirmPassword: z.string().min(1, {
+      message: "register.step3.form.confirmPassword.errors.required",
+    }),
+  })
+  .refine(({ confirmPassword, password }) => confirmPassword === password, {
+    message: "register.step3.form.confirmPassword.errors.not_matching",
+    path: ["confirmPassword"],
+  });
 
 export const registerStepTwoSchema = z.object({
   firstName: z.string().min(1, {

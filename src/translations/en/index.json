@@ -57,6 +57,21 @@
             "inUse": "Email already in use"
           }
         },
+        "password": {
+          "placeholder": "Enter a secure password",
+          "label": "Password",
+          "errors": {
+            "required": "Password is required"
+          }
+        },
+        "confirmPassword": {
+          "placeholder": "Confirm password here",
+          "label": "Confirm Password",
+          "errors": {
+            "required": "Confirm password is required",
+            "not_matching": "Passwords dosent match"
+          }
+        },
         "button": {
           "text": "Continue"
         },
@@ -72,7 +87,7 @@
         "title": "Enter your name",
         "description": "Enter your full name to allow us to manage your data",
         "button": {
-          "text": "Continue"
+          "text": "Finish Register"
         },
         "firstName": {
           "placeholder": "Enter your first name here",

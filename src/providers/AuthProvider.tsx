@@ -5,7 +5,6 @@ import { environments } from "@/cofig/environments";
 interface Props {
   children: ReactNode;
 }
-console.log({ environments });
 
 const AuthProvider = ({ children }: Props) => {
   return (

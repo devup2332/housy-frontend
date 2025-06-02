@@ -8,20 +8,17 @@ import TranslationProvider from "./providers/TranslationProvider.tsx";
 import ThemeProvider from "./providers/ThemeProvider.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
-import AuthProvider from "./providers/AuthProvider.tsx";
 import { Toaster } from "sonner";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <Provider store={store}>
-        <ThemeProvider>
-          <TranslationProvider>
-            <RouterProvider router={router} />
-            <Toaster />
-          </TranslationProvider>
-        </ThemeProvider>
-      </Provider>
-    </AuthProvider>
+    <Provider store={store}>
+      <ThemeProvider>
+        <TranslationProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </TranslationProvider>
+      </ThemeProvider>
+    </Provider>
   </StrictMode>,
 );

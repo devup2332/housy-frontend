@@ -1,5 +1,6 @@
 import Loader from "@/components/UI/Loader";
-import { useUser } from "@clerk/clerk-react";
+import { supabase } from "@/utils/supabase";
+import type { Session } from "@supabase/supabase-js";
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router";
 
@@ -9,20 +10,25 @@ type Props = {
 
 const PrivateRoute = ({ Component }: Props) => {
   const [loading, setLoading] = useState(true);
-  const { isLoaded, isSignedIn } = useUser();
-  console.log({
-    isLoaded,
-    loading,
-    isSignedIn,
-  });
+  const [currentSession, setCurrentSession] = useState<undefined | Session>();
+
+  const init = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session) {
+      setCurrentSession(session);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (isLoaded) setLoading(false);
-  }, [isLoaded, isSignedIn]);
+    init();
+  }, []);
 
   if (loading) return <Loader />;
 
-  if (isSignedIn) return <Component />;
+  if (currentSession) return <Component />;
 
   return <Navigate to="/login" />;
 };
