@@ -26,7 +26,7 @@ import { LANGUAGE_KEY } from "@/providers/TranslationProvider";
 import type { FieldControl } from "@/types/controls";
 import { setTheme } from "@/store/slices/ThemeSlice";
 import { toast } from "sonner";
-import { loginWithGoogle } from "@/utils/supabase";
+import { loginWithGoogle, supabase } from "@/utils/supabase";
 
 const fields: FieldControl<LoginSchemaFields>[] = [
   {
@@ -58,11 +58,35 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   const handleLogin = async (data: LoginSchemaType) => {
     try {
+      const { email, password } = data;
       setLoading(true);
-      console.log({ data });
-
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.signInWithPassword({
+        password,
+        email,
+      });
+      console.log({ error, user });
+      if (error) {
+        return toast.custom(
+          () => {
+            return (
+              <Toast
+                text={t(`login.form.errors.server_error`)}
+                type="error"
+                className="bg-bg-1 text-text-1 border-border-2 max-w-[350px]"
+              />
+            );
+          },
+          {
+            position: "bottom-center",
+          },
+        );
+      }
       navigate("/dashboard");
     } catch (err: any) {
       toast.custom(
@@ -84,10 +108,11 @@ const Login = () => {
       setLoading(false);
     }
   };
+
   const googleLogin = () => loginWithGoogle();
   return (
-    <div className="h-screen bg-bg-1 lg:bg-bg-2 grid place-items-center">
-      <div className="w-10/12 grid gap-6 max-w-sm lg:bg-bg-1 p-4 lg:max-w-[480px] lg:px-14 lg:rounded-xl lg:py-14 lg:shadow-lg lg:shadow-shadow-1 2xl:py-20">
+    <div className="h-screen bg-bg-1 md:bg-bg-2 grid place-items-center">
+      <div className="w-10/12 grid gap-6 max-w-sm md:bg-bg-1 p-4 md:max-w-[480px] md:px-14 md:rounded-xl md:py-14 md:shadow-lg md:shadow-shadow-1 2xl:py-20">
         <div className="grid gap-3">
           <h1 className="text-center text-text-1 text-2xl font-bold">
             {t("login.title")}

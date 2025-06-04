@@ -1,3 +1,4 @@
+import { IMG_USER_DEFAULT } from "@/cofig/constants";
 import LoaderIcon from "@/components/Icons/LoaderIcon";
 import FormControl from "@/components/UI/FormControl";
 import {
@@ -8,7 +9,9 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setRegisterData } from "@/store/slices/RegisterSlice";
 import type { FieldControl } from "@/types/controls";
+import { supabase } from "@/utils/supabase";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { User } from "@supabase/supabase-js";
 import { Button } from "housy-lib";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -34,6 +37,7 @@ const Step2 = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { lastName, firstName } = useAppSelector((state) => state.register);
+  const [userSupabase, setUserSupabase] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const {
@@ -65,9 +69,30 @@ const Step2 = () => {
     setValue("lastName", lastName || "");
     setValue("firstName", firstName || "");
   }, [firstName, lastName, setValue]);
+
+  const getUserSupabase = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    setUserSupabase(user);
+  };
+
+  useEffect(() => {
+    getUserSupabase();
+  }, []);
   return (
     <>
       <div className="grid gap-3">
+        {userSupabase?.app_metadata?.provider === "google" && (
+          <div className="bg-bg-2 w-fit px-4 py-2 text-text-1 rounded-md flex gap-4 items-center justify-self-center">
+            <img
+              src={userSupabase?.user_metadata.avatar_url || IMG_USER_DEFAULT}
+              alt="User profile image"
+              className="w-10 h-10 rounded-full"
+            />
+            <p className="text-sm"> {userSupabase?.email}</p>
+          </div>
+        )}
         <h1 className="text-center text-text-1 text-2xl font-bold">
           {t("register.step2.form.title")}
         </h1>

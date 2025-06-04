@@ -56,7 +56,7 @@ const Step1 = () => {
   } = useForm({
     resolver: zodResolver(registerStepOneSchema),
   });
-  const registerGoogle = () => loginWithGoogle("/register/step1");
+  const registerGoogle = () => loginWithGoogle("/register/fullName");
   const continueForm = async (data: RegisterSchemaStepOneType) => {
     try {
       const { email, password } = data;

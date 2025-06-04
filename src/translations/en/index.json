@@ -16,7 +16,9 @@
         "too_many_requests": "Too many requests. Please try again in a bit.",
         "form_identifier_not_found": "Account was not found",
         "form_password_incorrect": "Password is incorrect",
-        "session_exists": "You already have an active session"
+        "session_exists": "You already have an active session",
+        "invalid_credentials": "Email or password is incorrect.",
+        "server_error": "Error server, plese try later."
       },
       "email": {
         "name": "email",

@@ -1,5 +1,4 @@
 export const environments = {
-  CLERK_PUBLISHABLE_KEY: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
   SUPABASE_PROJECT_URL: import.meta.env.VITE_SUPABASE_PROJECT_URL,
   SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
 };
